@@ -26,9 +26,10 @@ router.post("/register", async (req, res, next) => {
       process.env.SESSION_SECRET,
       { expiresIn: 86400 }
     );
+    res.cookie("token", token, { httpOnly: true });
     res.json({
       ...user.dataValues,
-      token,
+      token
     });
   } catch (error) {
     if (error.name === "SequelizeUniqueConstraintError") {
@@ -48,8 +49,8 @@ router.post("/login", async (req, res, next) => {
 
     const user = await User.findOne({
       where: {
-        username: req.body.username,
-      },
+        username: req.body.username
+      }
     });
 
     if (!user) {
@@ -64,9 +65,10 @@ router.post("/login", async (req, res, next) => {
         process.env.SESSION_SECRET,
         { expiresIn: 86400 }
       );
+      res.cookie("token", token, { httpOnly: true });
       res.json({
         ...user.dataValues,
-        token,
+        token
       });
     }
   } catch (error) {
@@ -75,6 +77,7 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.delete("/logout", (req, res, next) => {
+  res.clearCookie("token");
   res.sendStatus(204);
 });
 
